@@ -1,10 +1,14 @@
 import tkinter
-from math import sin, cos, tan, log, sqrt, radians, factorial, exp, fabs, floor, ceil
+from math import sin, cos, tan, log, sqrt, radians
 
 class Calculator:
     def __init__(self, master):
         self.master = master
         master.title("Продвинутий калькулятор")
+        master.geometry("450x450")
+
+        self.last_result = ""
+        self.dark_mode = False
 
         self.history = []
 
@@ -13,6 +17,10 @@ class Calculator:
         self.entry.bind("<Button-3>", self.show_context_menu)
 
         self.create_buttons()
+
+        self.toggle_theme_button = tkinter.Button(master, text="Тема", command=self.toggle_theme)
+        self.toggle_theme_button.grid(row=5, column=4, columnspan=2)
+        self.apply_theme()
 
         self.history_box = tkinter.Text(master, height=6, width=45, font=('Arial', 10))
         self.history_box.grid(row=6, column=0, columnspan=5, padx=10, pady=5)
@@ -43,6 +51,7 @@ class Calculator:
             ).grid(row=row, column=col, padx=2, pady=2)
 
     def on_button_click(self, char):
+        global result
         if char == '=':
             try:
                 expression = self.entry.get().replace('^', '**')
@@ -113,6 +122,23 @@ class Calculator:
 
     def clear_entry(self):
         self.entry.delete(0, tkinter.END)
+
+    def toggle_theme(self):
+        self.dark_mode = not self.dark_mode
+        self.apply_theme()
+
+    def apply_theme(self):
+        backg = "#1e1e1e" if self.dark_mode else "#ffffff"
+        text = "#ffffff" if self.dark_mode else "#000000"
+        entry_backg = "#2e2e2e" if self.dark_mode else "#ffffff"
+
+        self.master.configure(bg=backg)
+        self.entry.configure(bg=entry_backg, fg=text, insertbackground=text)
+        for widget in self.master.winfo_children():
+            if isinstance(widget, tkinter.Button):
+                widget.configure(bg=backg, fg=text, activebackground=entry_backg, activeforeground=text, highlightbackground=backg)
+            elif isinstance(widget, tkinter.Entry):
+                widget.configure(bg=entry_backg, fg=text)
 
 
 if __name__ == "__main__":
